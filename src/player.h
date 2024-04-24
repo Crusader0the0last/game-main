@@ -4,12 +4,24 @@
 #include <SDL.h>
 #include <stdbool.h>
 
+typedef enum direction {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    UPLEFT,
+    UPRIGHT,
+    DOWNLEFT,
+    DOWNRIGHT
+} direction;
+
 typedef struct Player{
     int x;
     int y;
     int width;
     int height;
     SDL_Rect rect;
+    direction dir;
     int speed;
     int health;
     int score;
@@ -17,7 +29,7 @@ typedef struct Player{
 } Player;
 
 Player playerCreate(int x, int y, int width, int height, int speed, int health, int score);
-void playerMove(Player* player, const Uint8* state);
+void playerMove(Player* player, const Uint8* state, int playerspeed);
 void playerCombat(Player* player, const Uint8* state);
 
 

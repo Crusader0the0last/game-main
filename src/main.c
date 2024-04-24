@@ -6,10 +6,14 @@
 #include <SDL.h>
 #include "bullet.h"
 #include "enemy.h"
+#include "player.h"
 
 
 int main() {
     printf("Hello, SDL!\n");
+
+    Player player = playerCreate(0, 0, 50, 50, 3, 100, 0);
+
     //creating projectiles
     Bullet bullet1 = bulletCreate(0, 0, 10, 10, 10);
     Bullet bullet2 = bulletCreate(0, 0, 10, 10, 10);
@@ -63,7 +67,6 @@ int main() {
         SDL_Quit();
         return 1;
     }
-    SDL_Rect player = { 0, 0, 50, 50 };
 
     SDL_Event e;
     bool quit = false;
@@ -82,7 +85,7 @@ int main() {
         SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &player);
+        SDL_RenderFillRect(renderer, &player.rect);
         const Uint8* state = SDL_GetKeyboardState(NULL);
         enum direction {UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT};
         direction dir = RIGHT;
@@ -104,7 +107,7 @@ int main() {
             //}
             for(int i = 0; i < 5; i++){
                 if(bullets[i].active == false) {
-                    bulletDirection(&bullets[i], dir, state);
+                    bulletDirection(&bullets[i], &player);
                     break;
                 }
             }

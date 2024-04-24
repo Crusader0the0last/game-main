@@ -14,32 +14,9 @@ Bullet bulletCreate(int x, int y, int width, int height, int speed) {
     return bullet;
 }
 
-void bulletDirection(Bullet* bullet, direction dir, const Uint8* state) {
+void bulletDirection(Bullet* bullet, Player* player) {
     bullet -> active = true;
-    if(state[SDL_SCANCODE_W] || dir == UP) {
-        bullet->dir = UP;
-    }
-    if(state[SDL_SCANCODE_S] || dir == DOWN) {
-        bullet -> dir = DOWN;
-    }
-    if(state[SDL_SCANCODE_A] || dir == LEFT) {
-        bullet -> dir = LEFT;
-    }
-    if(state[SDL_SCANCODE_D] || dir == RIGHT){
-        bullet -> dir = RIGHT;
-    }
-    if(state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A] || dir == UPLEFT) {
-        bullet -> dir = UPLEFT;
-    }
-    if(state[SDL_SCANCODE_D] && state[SDL_SCANCODE_W] || dir == UPRIGHT) {
-        bullet -> dir = UPRIGHT;
-    }
-    if(state[SDL_SCANCODE_A] && state[SDL_SCANCODE_S] || dir == DOWNLEFT) {
-        bullet -> dir = DOWNLEFT;
-    }
-    if(state[SDL_SCANCODE_D] && state[SDL_SCANCODE_S] || dir == DOWNRIGHT) {
-        bullet -> dir = DOWNRIGHT;
-    }
+    bullet->dir = player->dir;
 }
 
 void bulletMove(Bullet* bullet, direction dir, int playerX, int playerY) {

@@ -3,17 +3,7 @@
 
 #include <SDL.h>
 #include <stdbool.h>
-
-typedef enum direction {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    UPLEFT,
-    UPRIGHT,
-    DOWNLEFT,
-    DOWNRIGHT
-} direction;
+#include "player.h"
 
 typedef struct Bullet{
     int x;
@@ -28,6 +18,6 @@ typedef struct Bullet{
 
 Bullet bulletCreate(int x, int y, int width, int height, int speed);
 void bulletMove(Bullet* bullet, direction dir, int playerX, int playerY);
-void bulletDirection(Bullet* bullet, direction dir, const Uint8* state);
+void bulletDirection(Bullet* bullet, Player* player);
 
-#endif // BULLET_H
+#endif // BULLET_H, PLAYER_H
