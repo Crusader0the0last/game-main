@@ -11,8 +11,9 @@
 
 int main() {
     printf("Hello, SDL!\n");
-
+    int picture = 0;
     Player player = playerCreate(0, 0, 50, 50, 3, 100, 0);
+
 
     //creating projectiles
     Bullet bullet1 = bulletCreate(0, 0, 10, 10, 10);
@@ -40,7 +41,6 @@ int main() {
     Enemy SwiftTwins[2] = {enemySwiftTwin1, enemySwiftTwin2};
     Enemy SummonedOnes[3] = {summonedOne1, summonedOne2, summonedOne3};
     
-
     const int Ysize = 700;
     const int Xsize = 1000;
     int playerspeed = 3;
@@ -96,8 +96,14 @@ int main() {
             SDL_RenderFillRect(renderer, &Petove[e].rect);
             enemyMove(&Petove[e], bullets[e].x, bullets[e].y);
         }
-        // int direction;
-        
+    SDL_Texture* playerTexture = NULL;
+    SDL_Surface* playerSurface = SDL_LoadBMP("assets/player.bmp");
+    if(playerSurface == NULL){
+        fprintf(stderr, "SDL_LoadBMP Error: %s\n", SDL_GetError());
+        return 1;
+    }
+    playerTexture = SDL_CreateTextureFromSurface(renderer, playerSurface);
+
         //player combat
         static bool isFKeyPressed = false;
         if(state[SDL_SCANCODE_F] && !isFKeyPressed){
@@ -112,18 +118,25 @@ int main() {
                 }
             }
         }
+        picture++;
+        SDL_RenderCopy(renderer, playerTexture, picture, &player.rect);
+        
         if(!state[SDL_SCANCODE_F]){
             isFKeyPressed = false;
         }
         for(int i = 0; i < 5; i++){
             bulletMove(&bullets[i], bullets[i].dir, player.x, player.y);
         }
+        
+
+        
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderFillRect(renderer, &bullets[0].rect);
         SDL_RenderFillRect(renderer, &bullets[1].rect);
         SDL_RenderFillRect(renderer, &bullets[2].rect);
         SDL_RenderFillRect(renderer, &bullets[3].rect);
         SDL_RenderFillRect(renderer, &bullets[4].rect);
+        
         
         // Update the screen
         SDL_RenderPresent(renderer); 

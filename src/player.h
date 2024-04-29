@@ -26,6 +26,7 @@ typedef struct Player{
     int health;
     int score;
     bool active;
+    bool moving;
 } Player;
 
 Player playerCreate(int x, int y, int width, int height, int speed, int health, int score);
