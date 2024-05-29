@@ -1,56 +1,86 @@
-#include "./player.h"
+#include "player.h"
 
-Player playerCreate(int x, int y, int width, int height, int speed, int health, int score){
-    Player player;
-    player.x = x;
-    player.y = y;
-    player.width = width;
-    player.height = height;
-    player.rect = (SDL_Rect){x, y, width, height};
-    player.speed = speed;
-    player.health = health;
-    player.score = score;
-    player.active = true;
-    player.moving = false;
+Player* createPlayer(int x, int y, int width, int height, int health, int speed, int score){
+    Player* player = (Player*)malloc(sizeof(Player));
+    player->x = x;
+    player->y = y;
+    player->width = width;
+    player->height = height;
+    player->health = health;
+    player->speed = speed;
+    player->score = score;
+    player->dir = RIGHT;
+    player->isAlive = true;
+    player->moving = false;
+    player->isShooting = false;
     return player;
 }
 
-void playerMove(Player* player, const Uint8* state, int playerspeed){
-    if (state[SDL_SCANCODE_W]) {
+Bullet* createBullet(int x, int y, int width, int height, int speed, direction dir){
+    Bullet* bullet = (Bullet*)malloc(sizeof(Bullet));
+    bullet->x = x;
+    bullet->y = y;
+    bullet->width = width;
+    bullet->height = height;
+    bullet->speed = speed;
+    bullet->dir = dir;
+    bullet->isActive = false;
+    bullet->hit = false;
+    bullet->frame = 0;
+    return bullet;
+}
+
+void movePlayer(Player* player, direction dir){
+    if(dir == UP){
         player->y -= player->speed;
-        player -> dir = UP;
-        player -> moving = true;
     }
-    if (state[SDL_SCANCODE_S]) {
+    if(dir == DOWN){
         player->y += player->speed;
-        player -> dir = DOWN;
-        player -> moving = true;
     }
-    if (state[SDL_SCANCODE_A]) {
+    if(dir == LEFT){
         player->x -= player->speed;
-        player -> dir = LEFT;
-        player -> moving = true;
     }
-    if (state[SDL_SCANCODE_D]) {
+    if(dir == RIGHT){
         player->x += player->speed;
-        player -> dir = RIGHT;
-        player -> moving = true;
     }
-        if(state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A]) {
-        player -> dir = UPLEFT;
+}
+
+void combatPlayer(Player* player, Bullet* bullet){
+    bullet->isActive = true;
+    bullet->dir = player->dir;
+}
+void updateBullet(Bullet* bullet, Player* player){
+    if(bullet->isActive == true){
+        if(bullet->dir == UP){
+            bullet->y -= bullet->speed;
+        }
+        if(bullet->dir == DOWN){
+            bullet->y += bullet->speed;
+        }
+        if(bullet->dir == LEFT){
+            bullet->x -= bullet->speed;
+        }
+        if(bullet->dir == RIGHT){
+            bullet->x += bullet->speed;
+        }
     }
-    if(state[SDL_SCANCODE_D] && state[SDL_SCANCODE_W]) {
-        player -> dir = UPRIGHT;
+    if(bullet->x < 0 || bullet->x >= 10000 || bullet->y < 0 || bullet->y >= 70000){
+        bullet->isActive = false;
+        bullet->hit = true;
     }
-    if(state[SDL_SCANCODE_A] && state[SDL_SCANCODE_S]) {
-        player -> dir = DOWNLEFT;
+    if(bullet->isActive == false){
+        bullet->x = player->x;
+        bullet->y = player->y;
     }
-    if(state[SDL_SCANCODE_D] && state[SDL_SCANCODE_S]) {
-        player->dir = DOWNRIGHT;
+}
+
+void updatePlayer(Player* player){
+    if(player->health <= 0){
+        player->isAlive = false;
     }
-    else {
-        player -> moving = false;
-    }
-    player->rect.x = player->x;
-    player->rect.y = player->y;
+    
+}
+
+void destroyPlayer(Player* player){
+    free(player);
 }

@@ -1,57 +1,46 @@
 #define SDL_MAIN_HANDLED
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <time.h>
-#include <SDL.h>
-#include "bullet.h"
 #include "enemy.h"
-#include "player.h"
+#include <SDL_image.h>
 
 
-int main() {
-    printf("Hello, SDL!\n");
-    int picture = 0;
-    Player player = playerCreate(0, 0, 50, 50, 3, 100, 0);
 
+int main(){
+    Uint32 startTime = SDL_GetTicks();
+    int x = 0;
+    int Xsize = 1000;
+    int Ysize = 700;
 
-    //creating projectiles
-    Bullet bullet1 = bulletCreate(0, 0, 10, 10, 10);
-    Bullet bullet2 = bulletCreate(0, 0, 10, 10, 10);
-    Bullet bullet3 = bulletCreate(0, 0, 10, 10, 10);
-    Bullet bullet4 = bulletCreate(0, 0, 10, 10, 10);
-    Bullet bullet5 = bulletCreate(0, 0, 10, 10, 10);
-    Bullet bullets[5] = {bullet1, bullet2, bullet3, bullet4, bullet5};
+    SDL_Texture *enemyTexture = NULL;
+    SDL_Texture *playerTexture = NULL;
+    SDL_Texture *bulletTexture = NULL;
+    SDL_Texture *backgroundTexture = NULL;
+
+    Player* player = createPlayer(100, 100, 200, 200, 100, 3, 0);
     
-    // creating entities
-    Enemy enemyPetr1 = enemyCreate(0, 0, 50, 50, ENEMY1, 2, 30);
-    Enemy enemyPetr2 = enemyCreate(0, 0, 50, 50, ENEMY1, 2, 30);
-    Enemy enemyPetr3 = enemyCreate(0, 0, 50, 50, ENEMY1, 2, 30);
-    Enemy enemyPetr4 = enemyCreate(0, 0, 50, 50, ENEMY1, 2, 30);
-    Enemy enemySwiftTwin1 = enemyCreate(0, 0, 30, 30, ENEMY2, 4, 15);
-    Enemy enemySwiftTwin2 = enemyCreate(0, 0, 30, 30, ENEMY2, 4, 15);
-    Enemy enemySummoner = enemyCreate(0, 0, 30, 30, ENEMY3, 1, 30);
-    Enemy Boss = enemyCreate(0, 0, 80, 80, ENEMY4, 2, 100);
-    Enemy summonedOne1 = enemyCreate(0, 0, 55, 55, ENEMY5, 2, 40);
-    Enemy summonedOne2 = enemyCreate(0, 0, 55, 55, ENEMY5, 2, 40);
-    Enemy summonedOne3 = enemyCreate(0, 0, 55, 55, ENEMY5, 2, 40);
+    Bullet* bullet = createBullet(100, 100, 200, 200, 20, RIGHT);
+    Bullet* bullet2 = createBullet(100, 100, 200, 200, 20, RIGHT);
+    Bullet* bullet3 = createBullet(100, 100, 200, 200, 20, RIGHT);
+    Bullet* bullet4 = createBullet(100, 100, 200, 200, 20, RIGHT);
+    Bullet* bullet5 = createBullet(100, 100, 200, 200, 20, RIGHT);
+    Bullet* bullets[5] = {bullet, bullet2, bullet3, bullet4, bullet5};
 
-    //grouping same enemy types
-    Enemy Petove[4] = {enemyPetr1, enemyPetr2, enemyPetr3, enemyPetr4};
-    Enemy SwiftTwins[2] = {enemySwiftTwin1, enemySwiftTwin2};
-    Enemy SummonedOnes[3] = {summonedOne1, summonedOne2, summonedOne3};
-    
-    const int Ysize = 700;
-    const int Xsize = 1000;
-    int playerspeed = 3;
+    Enemy* enemy1 = createSimpleEnemy(500, 0, 200, 200, 100, 2);
+    Enemy* enemy2 = createSimpleEnemy(500, 200, 200, 200, 100, 2);
+    Enemy* enemy3 = createSimpleEnemy(500, 300, 200, 200, 100, 2);
+    Enemy* enemy4 = createSimpleEnemy(100, 100, 200, 200, 50, 5);
+    Enemy* enemy5 = createSimpleEnemy(100, 100, 200, 200, 50, 5);
+    Enemy* enemy6 = createSimpleEnemy(100, 100, 200, 200, 70, 3);
 
-    // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
-        return 1;
+    Enemy* enemies[6] = {enemy1, enemy2, enemy3, enemy4, enemy5, enemy6};
+    SDL_Rect enemyRect[6];
+
+
+    SDL_Rect bulletRect[5];
+    for(int i = 0; i < 5; i++){
+        bulletRect[i] = (SDL_Rect){bullets[i]->x, bullets[i]->y, bullets[i]->width, bullets[i]->height};
     }
-
-    // Create a window
+    
+       // Create a window
     SDL_Window* window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Xsize, Ysize, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if (window == NULL) {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -68,6 +57,11 @@ int main() {
         return 1;
     }
 
+
+    Uint32 currentTime = 0;
+
+    const Uint8* state = SDL_GetKeyboardState(NULL);
+
     SDL_Event e;
     bool quit = false;
     while (!quit) {
@@ -79,72 +73,145 @@ int main() {
                 quit = true;
             }
         }
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    state = SDL_GetKeyboardState(NULL);
 
-        // Set render color to white
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderClear(renderer);
-
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &player.rect);
-        const Uint8* state = SDL_GetKeyboardState(NULL);
-        enum direction {UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT};
-        direction dir = RIGHT;
-        playerMove(&player, state, playerspeed);
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        for(int e = 0; e < 4; e++){
-            SDL_RenderFillRect(renderer, &Petove[e].rect);
-            enemyMove(&Petove[e], bullets[e].x, bullets[e].y);
-        }
-    SDL_Texture* playerTexture = NULL;
-    SDL_Surface* playerSurface = SDL_LoadBMP("assets/player.bmp");
-    if(playerSurface == NULL){
-        fprintf(stderr, "SDL_LoadBMP Error: %s\n", SDL_GetError());
-        return 1;
+    if(state[SDL_SCANCODE_W]){
+        player->moving = true;
+        movePlayer(player, UP);
     }
-    playerTexture = SDL_CreateTextureFromSurface(renderer, playerSurface);
+    if(state[SDL_SCANCODE_S]){
+        player->moving = true;
+        movePlayer(player, DOWN);
+    }
+    if(state[SDL_SCANCODE_A]){
+        player->moving = true;
+        movePlayer(player, LEFT);
+        player->dir = LEFT;
+    }
+    if(state[SDL_SCANCODE_D]){
+        player->moving = true;
+        movePlayer(player, RIGHT);
+        player->dir = RIGHT;
+    }
+    if(!state[SDL_SCANCODE_W] && !state[SDL_SCANCODE_S] && !state[SDL_SCANCODE_A] && !state[SDL_SCANCODE_D]){
+        player->moving = false;
+    }
 
-        //player combat
-        static bool isFKeyPressed = false;
-        if(state[SDL_SCANCODE_F] && !isFKeyPressed){
+    static bool isFKeyPressed = false;
+        if(state[SDL_SCANCODE_F] && !isFKeyPressed && player->isShooting == false){
             isFKeyPressed = true;
             //if(bullet1active == true && bullet2active == true && bullet3active == true && bullet4active == true && bullet5active == true){
             //sdl2_ttf::messageBox("no mana");
             //}
             for(int i = 0; i < 5; i++){
-                if(bullets[i].active == false) {
-                    bulletDirection(&bullets[i], &player);
+                if(bullets[i]->isActive == false) {
+                    x = 0;
+                    player->isShooting = true;
+                    combatPlayer(player, bullets[i]);
                     break;
                 }
             }
         }
-        picture++;
-        SDL_RenderCopy(renderer, playerTexture, picture, &player.rect);
-        
-        if(!state[SDL_SCANCODE_F]){
-            isFKeyPressed = false;
-        }
-        for(int i = 0; i < 5; i++){
-            bulletMove(&bullets[i], bullets[i].dir, player.x, player.y);
-        }
-        
+    if(state[SDL_SCANCODE_F]){
+        isFKeyPressed = false;
+    }
 
-        
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &bullets[0].rect);
-        SDL_RenderFillRect(renderer, &bullets[1].rect);
-        SDL_RenderFillRect(renderer, &bullets[2].rect);
-        SDL_RenderFillRect(renderer, &bullets[3].rect);
-        SDL_RenderFillRect(renderer, &bullets[4].rect);
-        
-        
-        // Update the screen
-        SDL_RenderPresent(renderer); 
+    for(int i = 0; i < 5; i++){
+        updateBullet(bullets[i], player);
+        bulletRect[i].x = bullets[i]->x;
+        bulletRect[i].y = bullets[i]->y;
+    }
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    //player texture render
+
+
+    if(player->moving == false && player->isShooting == false){
+        playerTexture = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Idle.png");
+    }
+    if(player->moving == true && player->isShooting == false){
+        playerTexture = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Walk.png");
+    }
+    if(player->isShooting == true){
+        playerTexture = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Attack_1.png");
+    }
+    bulletTexture = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Charge_2.png");
+
+    currentTime = SDL_GetTicks();
+    if(currentTime - startTime >= 100){
+        startTime = currentTime;
+        x++;
+        enemy1->frame++;
+        for(int i = 0; i < 5; i++){
+            bullets[i]->frame++;
+        }
+    }
+    if(x>7 && player->moving != true){
+        x = 0;
+    }
+    if(x>6 && (player->moving == true || player->isShooting == true)){
+        x = 0;
+        if(player->isShooting == true){
+            player->isShooting = false;
+        }
+    }
+    //rendering player
+
+    SDL_Rect playerRect = {player->x, player->y, player->width, player->height};
+
+    if(player->dir == RIGHT){
+        SDL_RenderCopyEx(renderer, playerTexture, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
+    }
+    else if(player->dir == LEFT){
+        SDL_RenderCopyEx(renderer, playerTexture, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
+    }
+
+
+
+    //bullet texture render
+
+    for(int i = 0; i < 5; i++){
+        if(bullets[i]->isActive == true){
+            if(bullets[i]->dir == RIGHT){
+                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 0 , NULL, 0);
+            }
+            else if(bullets[i]->dir == LEFT){
+                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 0 , NULL, 1);
+        }
+    }
+    if(bullets[i]->frame>5){
+        bullets[i]->frame = 0;
+    }
+    }
+    //render enemies
+    enemyTexture = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Skeleton/Walk.png");
+    for(int i = 0; i < 6; i++){
+        if(enemies[i]->isAlive == true && i < 3){
+            
+        }
+        enemyRect[i] = (SDL_Rect){enemies[i]->x, enemies[i]->y, enemies[i]->width, enemies[i]->height};
+
+        if(enemies[i]->dir == LEFT){
+            SDL_RenderCopyEx(renderer, enemyTexture, &(SDL_Rect) {enemies[i]->frame*150, 0, 150, 150}, &enemyRect[i], 0, NULL, 1);
+        }
+        else if(enemies[i]->dir == RIGHT){
+            SDL_RenderCopyEx(renderer, enemyTexture, &(SDL_Rect) {enemies[i]->frame*150, 0, 150, 150}, &enemyRect[i], 0, NULL, 0);
+        }
+        if(enemies[i]->frame>2){
+            enemies[i]->frame = 0;
+        }
+        moveEnemy(enemies[i]);
+
+    }
+
+    SDL_RenderPresent(renderer);
     }
     // Clean up resources
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
-
     return 0;
+
 }

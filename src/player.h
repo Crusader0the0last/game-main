@@ -1,37 +1,58 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <SDL.h>
+#include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
+#include <SDL.h>
 
-typedef enum direction {
+typedef enum direction{
     UP,
     DOWN,
     LEFT,
     RIGHT,
-    UPLEFT,
     UPRIGHT,
-    DOWNLEFT,
-    DOWNRIGHT
-} direction;
+    UPLEFT,
+    DOWNRIGHT,
+    DOWNLEFT
+}direction;
 
-typedef struct Player{
+typedef struct Bullet{
     int x;
     int y;
     int width;
     int height;
-    SDL_Rect rect;
-    direction dir;
     int speed;
+    direction dir;
+    bool isActive;
+    bool hit;
+    int frame;
+}Bullet;
+
+typedef struct Player{
     int health;
+    int speed;
     int score;
-    bool active;
+    int x;
+    int y;
+    int width;
+    int height;
+    direction dir;
+    bool isAlive;
     bool moving;
-} Player;
+    bool isShooting;
 
-Player playerCreate(int x, int y, int width, int height, int speed, int health, int score);
-void playerMove(Player* player, const Uint8* state, int playerspeed);
-void playerCombat(Player* player, const Uint8* state);
+}Player;
 
+Player* createPlayer(int x, int y, int width, int height, int health, int speed, int score);
+Bullet* createBullet(int x, int y, int width, int height, int speed, direction dir);
+
+void movePlayer(Player* player, direction dir);
+void combatPlayer(Player* player, Bullet* bullet);
+void updateBullet(Bullet* bullet, Player* player);
+
+void updatePlayer(Player* player);
+void destroyPlayer(Player* player);
 
 #endif // PLAYER_H

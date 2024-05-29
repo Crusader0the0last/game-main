@@ -1,31 +1,57 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#include <SDL.h>
-#include <stdbool.h>
+#include "player.h"
 
-typedef enum enemyType {
-    ENEMY1,
-    ENEMY2,
-    ENEMY3,
-    ENEMY4,
-    ENEMY5
-} enemyType;
-
-typedef struct enemy{
-    int enemyX; 
-    int enemyY;
+typedef struct Enemy{
+    int health;
+    int speed;
+    int x;
+    int y;
     int width;
     int height;
-    SDL_Rect rect;
-    enemyType type;
-    int speed;
-    bool alive;
-    int health;
-} Enemy;
+    direction dir;
+    bool isAlive;
+    bool moving;
+    bool isAttacking;
+    int frame;
+}Enemy;
 
-Enemy enemyCreate(int x, int y, int width, int height, enemyType type, int speed, int health);
-void enemyMove(Enemy* enemy, int playerX, int playerY);
-void enemyCombat(Enemy* enemy, int bulletX, int bulletY);
+typedef struct Boss{
+    int x;
+    int y;
+    int width;
+    int height;
+    int speed;
+    direction dir;
+    bool isActive;
+    bool hit;
+    int bossPhase;
+    int frame;
+}Boss;
+
+typedef struct enemyBullet{
+    int x;
+    int y;
+    int width;
+    int height;
+    int speed;
+    direction dir;
+    bool isActive;
+    bool hit;
+    int frame;
+}enemyBullet;
+
+Enemy* createSimpleEnemy(int x, int y, int width, int height, int health, int speed);
+Boss* createBoss(int x, int y, int width, int height, int speed);
+enemyBullet* createEnemyBullet(int x, int y, int width, int height, int speed, direction dir);
+
+void moveEnemy(Enemy* enemy);
+void moveBoss(Boss* boss);
+void updateEnemyBullet(enemyBullet* bullet);
+
+void enemyCombat(Enemy* enemy, enemyBullet* bullet, Player player);
+void bossCombat(Boss* boss, enemyBullet* bullet, Player player);
+
 
 #endif // ENEMY_H
