@@ -77,28 +77,6 @@ int main(){
     SDL_RenderClear(renderer);
     state = SDL_GetKeyboardState(NULL);
 
-    if(state[SDL_SCANCODE_W]){
-        player->moving = true;
-        movePlayer(player, UP);
-    }
-    if(state[SDL_SCANCODE_S]){
-        player->moving = true;
-        movePlayer(player, DOWN);
-    }
-    if(state[SDL_SCANCODE_A]){
-        player->moving = true;
-        movePlayer(player, LEFT);
-        player->dir = LEFT;
-    }
-    if(state[SDL_SCANCODE_D]){
-        player->moving = true;
-        movePlayer(player, RIGHT);
-        player->dir = RIGHT;
-    }
-    if(!state[SDL_SCANCODE_W] && !state[SDL_SCANCODE_S] && !state[SDL_SCANCODE_A] && !state[SDL_SCANCODE_D]){
-        player->moving = false;
-    }
-
     static bool isFKeyPressed = false;
         if(state[SDL_SCANCODE_F] && !isFKeyPressed && player->isShooting == false){
             isFKeyPressed = true;
@@ -116,6 +94,43 @@ int main(){
         }
     if(state[SDL_SCANCODE_F]){
         isFKeyPressed = false;
+    }
+    if(player->isShooting == false){
+     if(state[SDL_SCANCODE_W]){
+        player->moving = true;
+        movePlayer(player, UP);
+        player->dir = UP;
+    }
+    if(state[SDL_SCANCODE_S]){
+        player->moving = true;
+        movePlayer(player, DOWN);
+        player->dir = DOWN;
+    }
+    if(state[SDL_SCANCODE_A]){
+        player->moving = true;
+        movePlayer(player, LEFT);
+        player->dir = LEFT;
+    }
+    if(state[SDL_SCANCODE_D]){
+        player->moving = true;
+        movePlayer(player, RIGHT);
+        player->dir = RIGHT;
+    }
+    if(state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A]){
+        player->dir = UPLEFT;
+    }
+    if(state[SDL_SCANCODE_W] && state[SDL_SCANCODE_D]){
+        player->dir = UPRIGHT;
+    }
+    if(state[SDL_SCANCODE_S] && state[SDL_SCANCODE_A]){
+        player->dir = DOWNLEFT;
+    }
+    if(state[SDL_SCANCODE_S] && state[SDL_SCANCODE_D]){
+        player->dir = DOWNRIGHT;
+    }
+    if(!state[SDL_SCANCODE_W] && !state[SDL_SCANCODE_S] && !state[SDL_SCANCODE_A] && !state[SDL_SCANCODE_D]){
+        player->moving = false;
+    }
     }
 
     for(int i = 0; i < 5; i++){
@@ -161,10 +176,10 @@ int main(){
 
     SDL_Rect playerRect = {player->x, player->y, player->width, player->height};
 
-    if(player->dir == RIGHT){
+    if(player->dir == RIGHT || player->dir == UPRIGHT || player->dir == DOWNRIGHT){
         SDL_RenderCopyEx(renderer, playerTexture, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
     }
-    else if(player->dir == LEFT){
+    else if(player->dir == LEFT || player->dir == UPLEFT || player->dir == DOWNLEFT){
         SDL_RenderCopyEx(renderer, playerTexture, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
     }
 
@@ -179,7 +194,20 @@ int main(){
             }
             else if(bullets[i]->dir == LEFT){
                 SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 0 , NULL, 1);
-        }
+            }
+            else if(bullets[i]->dir == UPLEFT || bullets[i]->dir == DOWNLEFT){
+                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 45 , NULL, 1);
+            }
+            else if(bullets[i]->dir == UPRIGHT || bullets[i]->dir == DOWNRIGHT){
+                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 45 , NULL, 0);
+            }
+            else if(bullets[i]->dir == UP){
+                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 90 , NULL, 0);
+            }
+            else if(bullets[i]->dir == DOWN){
+                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 90 , NULL, 1);
+            }
+
     }
     if(bullets[i]->frame>5){
         bullets[i]->frame = 0;

@@ -63,6 +63,22 @@ void updateBullet(Bullet* bullet, Player* player){
         if(bullet->dir == RIGHT){
             bullet->x += bullet->speed;
         }
+        if(bullet->dir == UPRIGHT){
+            bullet->x += bullet->speed;
+            bullet->y -= bullet->speed;
+        }
+        if(bullet->dir == UPLEFT){
+            bullet->x -= bullet->speed;
+            bullet->y -= bullet->speed;
+        }
+        if(bullet->dir == DOWNRIGHT){
+            bullet->x += bullet->speed;
+            bullet->y += bullet->speed;
+        }
+        if(bullet->dir == DOWNLEFT){
+            bullet->x -= bullet->speed;
+            bullet->y += bullet->speed;
+        }
     }
     if(bullet->x < 0 || bullet->x >= 10000 || bullet->y < 0 || bullet->y >= 70000){
         bullet->isActive = false;
