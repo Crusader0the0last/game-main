@@ -40,6 +40,7 @@ typedef struct Player{
     int y;
     int width;
     int height;
+    int frame;
     direction dir;
     bool isAlive;
     bool moving;

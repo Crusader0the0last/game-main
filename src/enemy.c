@@ -111,8 +111,11 @@ void goblinCombat(goblin* enemy, Player* player, Bullet* bullet){
         }
         bullet->frame = 0;
     }
-    if(player->x >= (enemy->x - 75) && player->x <= (enemy->x + 50) && player->y >= (enemy->y - 50)&& player->y <= (enemy->y + 80) && enemy->isAlive == true){
+    if(player->x >= (enemy->x - 65) && player->x <= (enemy->x + 65) && player->y >= (enemy->y - 65)&& player->y <= (enemy->y + 55) && enemy->isAlive == true){
         player->health -= 10;
+        if(player->health <= 0){
+            player->isAlive = false;
+        }
     }
     if(enemy->health <= 0){
         enemy->isAlive = false;

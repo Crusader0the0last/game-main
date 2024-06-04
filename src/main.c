@@ -6,7 +6,6 @@
 
 int main(){
     Uint32 startTime = SDL_GetTicks();
-    int x = 0;
     int Xsize = 1500;
     int Ysize = 700;
 
@@ -108,7 +107,7 @@ int main(){
             //}
             for(int i = 0; i < 5; i++){
                 if(bullets[i]->isActive == false) {
-                    x = 0;
+                    player->frame = 0;
                     player->isShooting = true;
                     combatPlayer(player, bullets[i]);
                     break;
@@ -118,7 +117,7 @@ int main(){
     if(state[SDL_SCANCODE_F]){
         isFKeyPressed = false;
     }
-    if(player->isShooting == false){
+    if(player->isShooting == false && player->isAlive == true){
         if(state[SDL_SCANCODE_W]){
             player->moving = true;
             movePlayer(player, UP);
@@ -168,31 +167,31 @@ int main(){
     SDL_Rect playerRect = {player->x, player->y, player->width, player->height};
     if(player->dir == RIGHT || player->dir == UPRIGHT || player->dir == DOWNRIGHT || player->dir == UP || player->dir == DOWN){
         if(player->moving == false && player->isShooting == false){
-            SDL_RenderCopyEx(renderer, player->idle, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
+            SDL_RenderCopyEx(renderer, player->idle, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
         }
         if(player->moving == true && player->isShooting == false){
-            SDL_RenderCopyEx(renderer, player->walk, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
+            SDL_RenderCopyEx(renderer, player->walk, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
         }
         if(player->isShooting == true){
-            SDL_RenderCopyEx(renderer, player->attack, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
+            SDL_RenderCopyEx(renderer, player->attack, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
         }
     }
     else if(player->dir == LEFT || player->dir == UPLEFT || player->dir == DOWNLEFT || player->dir == UP || player->dir == DOWN){
         if(player->moving == false && player->isShooting == false){
-            SDL_RenderCopyEx(renderer, player->idle, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
+            SDL_RenderCopyEx(renderer, player->idle, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
         }
         if(player->moving == true && player->isShooting == false){
-            SDL_RenderCopyEx(renderer, player->walk, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
+            SDL_RenderCopyEx(renderer, player->walk, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
         }
         if(player->isShooting == true){
-            SDL_RenderCopyEx(renderer, player->attack, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
+            SDL_RenderCopyEx(renderer, player->attack, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
         }
     }
 
     currentTime = SDL_GetTicks();
     if(currentTime - startTime >= 100){
         startTime = currentTime;
-        x++;
+        player->frame++;
         for(int i = 0; i < 5; i++){
             bullets[i]->frame++;
             if(i < 3){
@@ -201,11 +200,11 @@ int main(){
             }
         }
     }
-    if(x>7 && player->moving != true){
-        x = 0;
+    if(player->frame > 7 && player->moving != true){
+        player->frame = 0;
     }
-    if(x>6 && (player->moving == true || player->isShooting == true)){
-        x = 0;
+    if(player->frame > 6 && (player->moving == true || player->isShooting == true)){
+        player->frame = 0;
         if(player->isShooting == true){
             player->isShooting = false;
         }

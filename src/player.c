@@ -13,7 +13,7 @@ Player* createPlayer(int x, int y, int width, int height, int health, int speed,
     player->isAlive = true;
     player->moving = false;
     player->isShooting = false;
-
+    player->frame = 0;
     return player;
 }
 
