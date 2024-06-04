@@ -28,6 +28,8 @@ typedef struct Bullet{
     bool isActive;
     bool hit;
     int frame;
+    int damage;
+    int angle;
 }Bullet;
 
 typedef struct Player{
@@ -42,7 +44,11 @@ typedef struct Player{
     bool isAlive;
     bool moving;
     bool isShooting;
-
+    SDL_Texture *walk;
+    SDL_Texture *idle;
+    SDL_Texture *attack;
+    SDL_Texture *hit;
+    SDL_Texture *dead;
 }Player;
 
 Player* createPlayer(int x, int y, int width, int height, int health, int speed, int score);

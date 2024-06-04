@@ -13,6 +13,7 @@ Player* createPlayer(int x, int y, int width, int height, int health, int speed,
     player->isAlive = true;
     player->moving = false;
     player->isShooting = false;
+
     return player;
 }
 
@@ -27,6 +28,8 @@ Bullet* createBullet(int x, int y, int width, int height, int speed, direction d
     bullet->isActive = false;
     bullet->hit = false;
     bullet->frame = 0;
+    bullet->damage = 20;
+    bullet->angle = 0;
     return bullet;
 }
 
@@ -49,44 +52,46 @@ void combatPlayer(Player* player, Bullet* bullet){
     bullet->isActive = true;
     bullet->dir = player->dir;
 }
+
 void updateBullet(Bullet* bullet, Player* player){
     if(bullet->isActive == true){
         if(bullet->dir == UP){
             bullet->y -= bullet->speed;
         }
-        if(bullet->dir == DOWN){
+        else if(bullet->dir == DOWN){
             bullet->y += bullet->speed;
         }
-        if(bullet->dir == LEFT){
+        else if(bullet->dir == LEFT){
             bullet->x -= bullet->speed;
         }
-        if(bullet->dir == RIGHT){
+        else if(bullet->dir == RIGHT){
             bullet->x += bullet->speed;
         }
-        if(bullet->dir == UPRIGHT){
-            bullet->x += bullet->speed;
-            bullet->y -= bullet->speed;
+        else if(bullet->dir == UPRIGHT){
+            bullet->x += bullet->speed - (bullet->speed/2);
+            bullet->y -= bullet->speed - (bullet->speed/2);
         }
-        if(bullet->dir == UPLEFT){
-            bullet->x -= bullet->speed;
-            bullet->y -= bullet->speed;
+        else if(bullet->dir == UPLEFT){
+            bullet->x -= bullet->speed - (bullet->speed/2);
+            bullet->y -= bullet->speed - (bullet->speed/2);
         }
-        if(bullet->dir == DOWNRIGHT){
-            bullet->x += bullet->speed;
-            bullet->y += bullet->speed;
+        else if(bullet->dir == DOWNRIGHT){
+            bullet->x += bullet->speed - (bullet->speed/2);
+            bullet->y += bullet->speed - (bullet->speed/2);
         }
-        if(bullet->dir == DOWNLEFT){
-            bullet->x -= bullet->speed;
-            bullet->y += bullet->speed;
+        else if(bullet->dir == DOWNLEFT){
+            bullet->x -= bullet->speed - (bullet->speed/2);
+            bullet->y += bullet->speed - (bullet->speed/2);
         }
+    }
+    else if(bullet->isActive == false){
+        bullet->x = player->x;
+        bullet->y = (player->y+10);
+        bullet->frame = 0;
     }
     if(bullet->x < 0 || bullet->x >= 10000 || bullet->y < 0 || bullet->y >= 70000){
         bullet->isActive = false;
         bullet->hit = true;
-    }
-    if(bullet->isActive == false){
-        bullet->x = player->x;
-        bullet->y = player->y;
     }
 }
 

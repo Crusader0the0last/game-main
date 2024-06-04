@@ -7,11 +7,9 @@
 int main(){
     Uint32 startTime = SDL_GetTicks();
     int x = 0;
-    int Xsize = 1000;
+    int Xsize = 1500;
     int Ysize = 700;
 
-    SDL_Texture *enemyTexture = NULL;
-    SDL_Texture *playerTexture = NULL;
     SDL_Texture *bulletTexture = NULL;
     SDL_Texture *backgroundTexture = NULL;
 
@@ -24,15 +22,20 @@ int main(){
     Bullet* bullet5 = createBullet(100, 100, 200, 200, 20, RIGHT);
     Bullet* bullets[5] = {bullet, bullet2, bullet3, bullet4, bullet5};
 
-    Enemy* enemy1 = createSimpleEnemy(500, 0, 200, 200, 100, 2);
-    Enemy* enemy2 = createSimpleEnemy(500, 200, 200, 200, 100, 2);
-    Enemy* enemy3 = createSimpleEnemy(500, 300, 200, 200, 100, 2);
-    Enemy* enemy4 = createSimpleEnemy(100, 100, 200, 200, 50, 5);
-    Enemy* enemy5 = createSimpleEnemy(100, 100, 200, 200, 50, 5);
-    Enemy* enemy6 = createSimpleEnemy(100, 100, 200, 200, 70, 3);
+    skeleton* skeleton1 = createSkeleton(1000, 100, 200, 200, 100, 2);
+    skeleton* skeleton2 = createSkeleton(1000, 200, 200, 200, 100, 2);
+    skeleton* skeleton3 = createSkeleton(1000, 300, 200, 200, 100, 2);
+    goblin* goblin1 = createGoblin(400, 100, 200, 200, 50, 5);
+    goblin* goblin2 = createGoblin(500, 100, 200, 200, 50, 5);
+    goblin* goblin3 = createGoblin(600, 100, 200, 200, 50, 5);
 
-    Enemy* enemies[6] = {enemy1, enemy2, enemy3, enemy4, enemy5, enemy6};
-    SDL_Rect enemyRect[6];
+    skeleton* skeletons[3] = {skeleton1, skeleton2, skeleton3};
+    goblin* goblins[3] = {goblin1, goblin2, goblin3};
+
+    Boss* boss = createBoss(1000, 100, 200, 200, 2);
+    
+    SDL_Rect goblinsRect[3];
+    SDL_Rect skeletonsRect[3];
 
 
     SDL_Rect bulletRect[5];
@@ -56,7 +59,26 @@ int main(){
         SDL_Quit();
         return 1;
     }
+    player->walk = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Walk.png");
+    player->idle = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Idle.png");
+    player->attack = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Attack_1.png");
+    player->dead = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Dead.png");
+    player->hit = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Hurt.png");
 
+    for(int i = 0; i<3; i++){
+        skeletons[i]->walk = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Skeleton/Walk.png");
+        skeletons[i]->idle = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Skeleton/Idle.png");
+        skeletons[i]->attack = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Skeleton/Attack.png");
+        skeletons[i]->dead = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Skeleton/Death.png");
+        skeletons[i]->hit = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Skeleton/Take Hit.png");
+
+        goblins[i]->walk = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Goblin/Run.png");
+        goblins[i]->idle = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Goblin/Idle.png");
+        goblins[i]->attack = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Goblin/Attack.png");
+        goblins[i]->dead = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Goblin/Death.png");
+        goblins[i]->hit = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Goblin/Take Hit.png");
+    }
+    bulletTexture = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Charge_2.png");
 
     Uint32 currentTime = 0;
 
@@ -64,6 +86,7 @@ int main(){
 
     SDL_Event e;
     bool quit = false;
+
     while (!quit) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
@@ -96,41 +119,41 @@ int main(){
         isFKeyPressed = false;
     }
     if(player->isShooting == false){
-     if(state[SDL_SCANCODE_W]){
-        player->moving = true;
-        movePlayer(player, UP);
-        player->dir = UP;
-    }
-    if(state[SDL_SCANCODE_S]){
-        player->moving = true;
-        movePlayer(player, DOWN);
-        player->dir = DOWN;
-    }
-    if(state[SDL_SCANCODE_A]){
-        player->moving = true;
-        movePlayer(player, LEFT);
-        player->dir = LEFT;
-    }
-    if(state[SDL_SCANCODE_D]){
-        player->moving = true;
-        movePlayer(player, RIGHT);
-        player->dir = RIGHT;
-    }
-    if(state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A]){
-        player->dir = UPLEFT;
-    }
-    if(state[SDL_SCANCODE_W] && state[SDL_SCANCODE_D]){
-        player->dir = UPRIGHT;
-    }
-    if(state[SDL_SCANCODE_S] && state[SDL_SCANCODE_A]){
-        player->dir = DOWNLEFT;
-    }
-    if(state[SDL_SCANCODE_S] && state[SDL_SCANCODE_D]){
-        player->dir = DOWNRIGHT;
-    }
-    if(!state[SDL_SCANCODE_W] && !state[SDL_SCANCODE_S] && !state[SDL_SCANCODE_A] && !state[SDL_SCANCODE_D]){
-        player->moving = false;
-    }
+        if(state[SDL_SCANCODE_W]){
+            player->moving = true;
+            movePlayer(player, UP);
+            player->dir = UP;
+        }
+        if(state[SDL_SCANCODE_S]){
+            player->moving = true;
+            movePlayer(player, DOWN);
+            player->dir = DOWN;
+        }
+        if(state[SDL_SCANCODE_A]){
+            player->moving = true;
+            movePlayer(player, LEFT);
+            player->dir = LEFT;
+        }
+        if(state[SDL_SCANCODE_D]){
+            player->moving = true;
+            movePlayer(player, RIGHT);
+            player->dir = RIGHT;
+        }
+        if(state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A]){
+            player->dir = UPLEFT;
+        }
+        if(state[SDL_SCANCODE_W] && state[SDL_SCANCODE_D]){
+            player->dir = UPRIGHT;
+        }
+        if(state[SDL_SCANCODE_S] && state[SDL_SCANCODE_A]){
+            player->dir = DOWNLEFT;
+        }
+        if(state[SDL_SCANCODE_S] && state[SDL_SCANCODE_D]){
+            player->dir = DOWNRIGHT;
+        }
+        if(!state[SDL_SCANCODE_W] && !state[SDL_SCANCODE_S] && !state[SDL_SCANCODE_A] && !state[SDL_SCANCODE_D]){
+            player->moving = false;
+        }
     }
 
     for(int i = 0; i < 5; i++){
@@ -142,25 +165,40 @@ int main(){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     //player texture render
 
-
-    if(player->moving == false && player->isShooting == false){
-        playerTexture = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Idle.png");
+    SDL_Rect playerRect = {player->x, player->y, player->width, player->height};
+    if(player->dir == RIGHT || player->dir == UPRIGHT || player->dir == DOWNRIGHT || player->dir == UP || player->dir == DOWN){
+        if(player->moving == false && player->isShooting == false){
+            SDL_RenderCopyEx(renderer, player->idle, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
+        }
+        if(player->moving == true && player->isShooting == false){
+            SDL_RenderCopyEx(renderer, player->walk, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
+        }
+        if(player->isShooting == true){
+            SDL_RenderCopyEx(renderer, player->attack, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
+        }
     }
-    if(player->moving == true && player->isShooting == false){
-        playerTexture = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Walk.png");
+    else if(player->dir == LEFT || player->dir == UPLEFT || player->dir == DOWNLEFT || player->dir == UP || player->dir == DOWN){
+        if(player->moving == false && player->isShooting == false){
+            SDL_RenderCopyEx(renderer, player->idle, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
+        }
+        if(player->moving == true && player->isShooting == false){
+            SDL_RenderCopyEx(renderer, player->walk, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
+        }
+        if(player->isShooting == true){
+            SDL_RenderCopyEx(renderer, player->attack, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
+        }
     }
-    if(player->isShooting == true){
-        playerTexture = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Attack_1.png");
-    }
-    bulletTexture = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Charge_2.png");
 
     currentTime = SDL_GetTicks();
     if(currentTime - startTime >= 100){
         startTime = currentTime;
         x++;
-        enemy1->frame++;
         for(int i = 0; i < 5; i++){
             bullets[i]->frame++;
+            if(i < 3){
+                goblins[i]->frame++;
+                skeletons[i]->frame++;
+            }
         }
     }
     if(x>7 && player->moving != true){
@@ -172,66 +210,110 @@ int main(){
             player->isShooting = false;
         }
     }
-    //rendering player
-
-    SDL_Rect playerRect = {player->x, player->y, player->width, player->height};
-
-    if(player->dir == RIGHT || player->dir == UPRIGHT || player->dir == DOWNRIGHT){
-        SDL_RenderCopyEx(renderer, playerTexture, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
-    }
-    else if(player->dir == LEFT || player->dir == UPLEFT || player->dir == DOWNLEFT){
-        SDL_RenderCopyEx(renderer, playerTexture, &(SDL_Rect) {x*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
-    }
-
 
 
     //bullet texture render
 
     for(int i = 0; i < 5; i++){
+        if(bullets[i]->dir == RIGHT || bullets[i]->dir == LEFT){
+            bullets[i]->angle = 0;
+        }
+        else if(bullets[i]->dir == DOWNRIGHT || bullets[i]->dir == UPLEFT){
+            bullets[i]->angle = 45;
+        }
+        else if(bullets[i]->dir == UPRIGHT || bullets[i]->dir == DOWNLEFT){
+            bullets[i]->angle = -45;
+        }
+        else if(bullets[i]->dir == UP || bullets[i]->dir == DOWN){
+            bullets[i]->angle = 90;
+        }
         if(bullets[i]->isActive == true){
-            if(bullets[i]->dir == RIGHT){
-                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 0 , NULL, 0);
-            }
-            else if(bullets[i]->dir == LEFT){
-                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 0 , NULL, 1);
-            }
-            else if(bullets[i]->dir == UPLEFT || bullets[i]->dir == DOWNLEFT){
-                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 45 , NULL, 1);
-            }
-            else if(bullets[i]->dir == UPRIGHT || bullets[i]->dir == DOWNRIGHT){
-                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 45 , NULL, 0);
-            }
-            else if(bullets[i]->dir == UP){
-                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 90 , NULL, 0);
-            }
-            else if(bullets[i]->dir == DOWN){
-                SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], 90 , NULL, 1);
-            }
-
+            SDL_RenderCopyEx(renderer, bulletTexture, &(SDL_Rect) {bullets[i]->frame*64, 0, 64, 128}, &bulletRect[i], bullets[i]->angle , NULL, 0);
+        }
+        if(bullets[i]->frame>5){
+            bullets[i]->frame = 0;
+        }
     }
-    if(bullets[i]->frame>5){
-        bullets[i]->frame = 0;
-    }
-    }
-    //render enemies
-    enemyTexture = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Skeleton/Walk.png");
-    for(int i = 0; i < 6; i++){
-        if(enemies[i]->isAlive == true && i < 3){
-            
-        }
-        enemyRect[i] = (SDL_Rect){enemies[i]->x, enemies[i]->y, enemies[i]->width, enemies[i]->height};
+    //load enemy textures
+    
+    for(int i = 0; i < 3; i++){
+        // moveSkeleton(skeletons[i]);
+        // moveGoblin(goblins[i]);
 
-        if(enemies[i]->dir == LEFT){
-            SDL_RenderCopyEx(renderer, enemyTexture, &(SDL_Rect) {enemies[i]->frame*150, 0, 150, 150}, &enemyRect[i], 0, NULL, 1);
+        skeletonsRect[i] = (SDL_Rect){skeletons[i]->x, skeletons[i]->y, skeletons[i]->width, skeletons[i]->height};
+        goblinsRect[i] = (SDL_Rect){goblins[i]->x, goblins[i]->y, goblins[i]->width, goblins[i]->height};
+        //goblin texture render
+        if(goblins[i]->isAlive == true && goblins[i]->moving == true){
+            if(goblins[i]->dir == LEFT){
+                SDL_RenderCopyEx(renderer, (goblins[i]->walk), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 1);
+            }
+            else if(goblins[i]->dir == RIGHT){
+                SDL_RenderCopyEx(renderer, (goblins[i]->walk), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 0);
+            }
+            if(goblins[i]->frame>7){
+                goblins[i]->frame = 0;
+            }
         }
-        else if(enemies[i]->dir == RIGHT){
-            SDL_RenderCopyEx(renderer, enemyTexture, &(SDL_Rect) {enemies[i]->frame*150, 0, 150, 150}, &enemyRect[i], 0, NULL, 0);
+        else if(goblins[i]->isAlive == true && goblins[i]->moving == false){
+            if(goblins[i]->dir == LEFT){
+                SDL_RenderCopyEx(renderer, (goblins[i]->idle), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 1);
+            }
+            else if(goblins[i]->dir == RIGHT){
+                SDL_RenderCopyEx(renderer, (goblins[i]->idle), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 0);
+            }
+            if(goblins[i]->frame>2){
+                goblins[i]->frame = 0;
+            }
         }
-        if(enemies[i]->frame>2){
-            enemies[i]->frame = 0;
+        else if(goblins[i]->isAlive == false){
+            if(goblins[i]->dir == LEFT){
+                SDL_RenderCopyEx(renderer, (goblins[i]->dead), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 1);
+            }
+            else if(goblins[i]->dir == RIGHT){
+                SDL_RenderCopyEx(renderer, (goblins[i]->dead), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 0);
+            }
         }
-        moveEnemy(enemies[i]);
-
+        //skeleton texture render
+        if(skeletons[i]->isAlive == true && skeletons[i]->moving == true){
+            if(skeletons[i]->dir == LEFT){
+                SDL_RenderCopyEx(renderer, (skeletons[i]->walk), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 1);
+            }
+            else if(skeletons[i]->dir == RIGHT){
+                SDL_RenderCopyEx(renderer, (skeletons[i]->walk), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 0);
+            }
+            if(skeletons[i]->frame>2){
+                skeletons[i]->frame = 0;
+            }
+        }
+        else if(skeletons[i]->isAlive == true && skeletons[i]->moving == false){
+            if(skeletons[i]->dir == LEFT){
+                SDL_RenderCopyEx(renderer, (skeletons[i]->idle), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 1);
+            }
+            else if(skeletons[i]->dir == RIGHT){
+                SDL_RenderCopyEx(renderer, (skeletons[i]->idle), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 0);
+            }
+            if(skeletons[i]->frame>2){
+                skeletons[i]->frame = 0;
+            }
+        }
+        else if(skeletons[i]->isAlive == false){
+            if(skeletons[i]->dir == LEFT){
+                SDL_RenderCopyEx(renderer, (skeletons[i]->dead), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 1);
+            }
+            else if(skeletons[i]->dir == RIGHT){
+                SDL_RenderCopyEx(renderer, (skeletons[i]->dead), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 0);
+            }
+        }
+    }
+    int bc = 0;
+    for(int e = 0; e < 3;){
+        skeletonCombat(skeletons[e], player, bullets[bc]);
+        goblinCombat(goblins[e], player, bullets[bc]);
+        bc++;
+        if(bc >= 4){
+            bc = 0;
+            e++;
+        }
     }
 
     SDL_RenderPresent(renderer);
@@ -241,5 +323,4 @@ int main(){
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
-
 }
