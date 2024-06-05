@@ -1,4 +1,5 @@
 #define SDL_MAIN_HANDLED
+
 #include "enemy.h"
 #include <SDL_image.h>
 
@@ -8,12 +9,13 @@ int main(){
     Uint32 startTime = SDL_GetTicks();
     int Xsize = 1500;
     int Ysize = 700;
-
     SDL_Texture *bulletTexture = NULL;
-    SDL_Texture *backgroundTexture = NULL;
 
+    //vytvareni objektu hrace a brany
+    Totem* totem = createtotem(100, 200, 200, 200, 100);
     Player* player = createPlayer(100, 100, 200, 200, 100, 3, 0);
     
+    //vytvareni objektu streli hrace
     Bullet* bullet = createBullet(100, 100, 200, 200, 20, RIGHT);
     Bullet* bullet2 = createBullet(100, 100, 200, 200, 20, RIGHT);
     Bullet* bullet3 = createBullet(100, 100, 200, 200, 20, RIGHT);
@@ -21,16 +23,20 @@ int main(){
     Bullet* bullet5 = createBullet(100, 100, 200, 200, 20, RIGHT);
     Bullet* bullets[5] = {bullet, bullet2, bullet3, bullet4, bullet5};
 
-    skeleton* skeleton1 = createSkeleton(1000, 100, 200, 200, 100, 2);
-    skeleton* skeleton2 = createSkeleton(1000, 200, 200, 200, 100, 2);
-    skeleton* skeleton3 = createSkeleton(1000, 300, 200, 200, 100, 2);
-    goblin* goblin1 = createGoblin(400, 100, 200, 200, 50, 5);
-    goblin* goblin2 = createGoblin(500, 100, 200, 200, 50, 5);
-    goblin* goblin3 = createGoblin(600, 100, 200, 200, 50, 5);
 
+    //vytvareni objektu skeleton a goblin(nepratele)
+    skeleton* skeleton1 = createSkeleton(2800, 100, 200, 200, 100, 2);
+    skeleton* skeleton2 = createSkeleton(2400, 200, 200, 200, 100, 2);
+    skeleton* skeleton3 = createSkeleton(2700, 300, 200, 200, 100, 2);
+    goblin* goblin1 = createGoblin(1200, 100, 200, 200, 50, 3);
+    goblin* goblin2 = createGoblin(1000, 300, 200, 200, 50, 3);
+    goblin* goblin3 = createGoblin(1100, 500, 200, 200, 50, 3);
+
+    //ukazatel na objekty
     skeleton* skeletons[3] = {skeleton1, skeleton2, skeleton3};
     goblin* goblins[3] = {goblin1, goblin2, goblin3};
 
+    //vytvareni objektu boss
     Boss* boss = createBoss(1000, 100, 200, 200, 2);
     
     SDL_Rect goblinsRect[3];
@@ -63,6 +69,9 @@ int main(){
     player->attack = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Attack_1.png");
     player->dead = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Dead.png");
     player->hit = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Hurt.png");
+
+    totem->main = IMG_LoadTexture(renderer, "pictures/FlyingObelisk_no_lightnings_no_letter.png");
+    totem->death = IMG_LoadTexture(renderer, "pictures/Holy VFX 02/Holy VFX 02.png");
 
     for(int i = 0; i<3; i++){
         skeletons[i]->walk = IMG_LoadTexture(renderer, "pictures/Monsters_Creatures_Fantasy/Skeleton/Walk.png");
@@ -100,7 +109,7 @@ int main(){
     state = SDL_GetKeyboardState(NULL);
 
     static bool isFKeyPressed = false;
-        if(state[SDL_SCANCODE_F] && !isFKeyPressed && player->isShooting == false){
+        if(state[SDL_SCANCODE_F] && !isFKeyPressed && player->isShooting == false && player->isHit == false){
             isFKeyPressed = true;
             //if(bullet1active == true && bullet2active == true && bullet3active == true && bullet4active == true && bullet5active == true){
             //sdl2_ttf::messageBox("no mana");
@@ -166,32 +175,65 @@ int main(){
 
     SDL_Rect playerRect = {player->x, player->y, player->width, player->height};
     if(player->dir == RIGHT || player->dir == UPRIGHT || player->dir == DOWNRIGHT || player->dir == UP || player->dir == DOWN){
-        if(player->moving == false && player->isShooting == false){
+        if(player->moving == false && player->isShooting == false && player->isAlive == true && player->isHit == false){
             SDL_RenderCopyEx(renderer, player->idle, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
         }
-        if(player->moving == true && player->isShooting == false){
+        else if(player->moving == true && player->isShooting == false && player->isAlive == true && player->isHit == false){
             SDL_RenderCopyEx(renderer, player->walk, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
         }
-        if(player->isShooting == true){
+        else if(player->isShooting == true && player->isAlive == true && player->isHit == false){
             SDL_RenderCopyEx(renderer, player->attack, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
+        }
+        else if(player->isAlive == false && player->isHit == false){
+            SDL_RenderCopyEx(renderer, player->dead, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
+        }
+        else if(player->isHit == true){
+            if(player->frame == 3){
+                player->isHit = false;
+            }
+            SDL_RenderCopyEx(renderer, player->hit, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 0);
         }
     }
     else if(player->dir == LEFT || player->dir == UPLEFT || player->dir == DOWNLEFT || player->dir == UP || player->dir == DOWN){
-        if(player->moving == false && player->isShooting == false){
+        if(player->moving == false && player->isShooting == false && player->isAlive == true && player->isHit == false){
             SDL_RenderCopyEx(renderer, player->idle, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
         }
-        if(player->moving == true && player->isShooting == false){
+        else if(player->moving == true && player->isShooting == false && player->isAlive == true && player->isHit == false){
             SDL_RenderCopyEx(renderer, player->walk, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
         }
-        if(player->isShooting == true){
+        else if(player->isShooting == true && player->isAlive == true && player->isHit == false){
             SDL_RenderCopyEx(renderer, player->attack, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
+        }
+        else if(player->isAlive == false && player->isHit == false){
+            SDL_RenderCopyEx(renderer, player->dead, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
+        }
+        else if(player->isHit == true){
+            if(player->frame == 3){
+                    player->isHit = false;
+            }
+            SDL_RenderCopyEx(renderer, player->hit, &(SDL_Rect) {player->frame*128, 0, 128, 128}, &playerRect, 0, NULL, 1);
         }
     }
 
     currentTime = SDL_GetTicks();
-    if(currentTime - startTime >= 100){
+    if(currentTime - startTime >= 150 && player->isAlive == false){
+        startTime = currentTime;
+        if(player->frame < 3){
+            player->frame++;
+        }
+        totem->frame++;
+        for(int i = 0; i < 5; i++){
+            bullets[i]->frame++;
+            if(i < 3){
+                goblins[i]->frame++;
+                skeletons[i]->frame++;
+            }
+        }
+    }
+    else if(currentTime - startTime >= 100 && player->isAlive == true){
         startTime = currentTime;
         player->frame++;
+        totem->frame++;
         for(int i = 0; i < 5; i++){
             bullets[i]->frame++;
             if(i < 3){
@@ -203,13 +245,16 @@ int main(){
     if(player->frame > 7 && player->moving != true){
         player->frame = 0;
     }
-    if(player->frame > 6 && (player->moving == true || player->isShooting == true)){
+    else if(player->frame > 6 && (player->moving == true || player->isShooting == true)){
         player->frame = 0;
         if(player->isShooting == true){
             player->isShooting = false;
         }
     }
-
+    if(totem->frame > 11){
+        totem->frame = 0;
+        totem->isHit = false;
+    }
 
     //bullet texture render
 
@@ -236,13 +281,13 @@ int main(){
     //load enemy textures
     
     for(int i = 0; i < 3; i++){
-        // moveSkeleton(skeletons[i]);
-        // moveGoblin(goblins[i]);
+        moveSkeleton(skeletons[i]);
+        moveGoblin(goblins[i]);
 
         skeletonsRect[i] = (SDL_Rect){skeletons[i]->x, skeletons[i]->y, skeletons[i]->width, skeletons[i]->height};
         goblinsRect[i] = (SDL_Rect){goblins[i]->x, goblins[i]->y, goblins[i]->width, goblins[i]->height};
         //goblin texture render
-        if(goblins[i]->isAlive == true && goblins[i]->moving == true){
+        if(goblins[i]->isAlive == true && goblins[i]->moving == true && goblins[i]->isAttacking == false){
             if(goblins[i]->dir == LEFT){
                 SDL_RenderCopyEx(renderer, (goblins[i]->walk), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 1);
             }
@@ -253,7 +298,7 @@ int main(){
                 goblins[i]->frame = 0;
             }
         }
-        else if(goblins[i]->isAlive == true && goblins[i]->moving == false){
+        else if(goblins[i]->isAlive == true && goblins[i]->moving == false && goblins[i]->isAttacking == false){
             if(goblins[i]->dir == LEFT){
                 SDL_RenderCopyEx(renderer, (goblins[i]->idle), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 1);
             }
@@ -264,7 +309,7 @@ int main(){
                 goblins[i]->frame = 0;
             }
         }
-        else if(goblins[i]->isAlive == false){
+        else if(goblins[i]->isAlive == false && goblins[i]->isAttacking == false){
             if(goblins[i]->dir == LEFT){
                 SDL_RenderCopyEx(renderer, (goblins[i]->dead), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 1);
             }
@@ -272,8 +317,19 @@ int main(){
                 SDL_RenderCopyEx(renderer, (goblins[i]->dead), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 0);
             }
         }
+        else if(goblins[i]->isAttacking == true && goblins[i]->isAlive == true){
+            if(goblins[i]->dir == LEFT){
+                SDL_RenderCopyEx(renderer, (goblins[i]->attack), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 1);
+            }
+            else if(goblins[i]->dir == RIGHT){
+                SDL_RenderCopyEx(renderer, (goblins[i]->attack), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 0);
+            }
+            if(goblins[i]->frame > 6){
+                goblins[i]->frame = 0;
+            }
+        }
         //skeleton texture render
-        if(skeletons[i]->isAlive == true && skeletons[i]->moving == true){
+        if(skeletons[i]->isAlive == true && skeletons[i]->moving == true && skeletons[i]->isAttacking == false){
             if(skeletons[i]->dir == LEFT){
                 SDL_RenderCopyEx(renderer, (skeletons[i]->walk), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 1);
             }
@@ -284,7 +340,7 @@ int main(){
                 skeletons[i]->frame = 0;
             }
         }
-        else if(skeletons[i]->isAlive == true && skeletons[i]->moving == false){
+        else if(skeletons[i]->isAlive == true && skeletons[i]->moving == false && skeletons[i]->isAttacking == false){
             if(skeletons[i]->dir == LEFT){
                 SDL_RenderCopyEx(renderer, (skeletons[i]->idle), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 1);
             }
@@ -295,7 +351,7 @@ int main(){
                 skeletons[i]->frame = 0;
             }
         }
-        else if(skeletons[i]->isAlive == false){
+        else if(skeletons[i]->isAlive == false && skeletons[i]->isAttacking == false){
             if(skeletons[i]->dir == LEFT){
                 SDL_RenderCopyEx(renderer, (skeletons[i]->dead), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 1);
             }
@@ -303,10 +359,21 @@ int main(){
                 SDL_RenderCopyEx(renderer, (skeletons[i]->dead), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 0);
             }
         }
+        else if(skeletons[i]->isAttacking == true && skeletons[i]->isAlive == true){
+            if(skeletons[i]->dir == LEFT){
+                SDL_RenderCopyEx(renderer, (skeletons[i]->attack), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 1);
+            }
+            else if(skeletons[i]->dir == RIGHT){
+                SDL_RenderCopyEx(renderer, (skeletons[i]->attack), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 0);
+            }
+            if(skeletons[i]->frame > 6){
+                skeletons[i]->frame = 0;
+            }
+        }
     }
     int bc = 0;
     for(int e = 0; e < 3;){
-        skeletonCombat(skeletons[e], player, bullets[bc]);
+        skeletonCombat(skeletons[e], player, bullets[bc], totem);
         goblinCombat(goblins[e], player, bullets[bc]);
         bc++;
         if(bc >= 4){
@@ -314,7 +381,13 @@ int main(){
             e++;
         }
     }
-
+    SDL_RenderCopyEx(renderer, totem->main, &(SDL_Rect) {totem->frame*200, 0, 400, 400}, &(SDL_Rect) {totem->x, totem->y, totem->width, totem->height}, 0, NULL, 0);
+    
+    for(int i =0; i<3; i++){
+        if(totem->isAlive == false){
+            SDL_RenderCopyEx(renderer, totem->death, &(SDL_Rect) {totem->frame*51, 0, 48, 48}, &(SDL_Rect) {totem->x, totem->y, totem->width, totem->height}, 0, NULL, 0);
+        }
+    }
     SDL_RenderPresent(renderer);
     }
     // Clean up resources

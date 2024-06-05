@@ -1,7 +1,7 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#include "player.h"
+#include "sacred.h"
 
 typedef struct Goblin{
     int health;
@@ -77,7 +77,7 @@ void moveGoblin(goblin* enemy);
 void moveBoss(Boss* boss);
 void updateEnemyBullet(enemyBullet* bullet);
 
-void skeletonCombat(skeleton* enemy, Player* player, Bullet* bullet);
+void skeletonCombat(skeleton* enemy, Player* player, Bullet* bullet, Totem* totem);
 void goblinCombat(goblin* enemy, Player* player, Bullet* bullet);
 
 void bossCombat(Boss* boss, enemyBullet* bullet, Player player);

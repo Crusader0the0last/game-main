@@ -22,7 +22,7 @@ skeleton* createSkeleton(int x, int y, int width, int height, int health, int sp
 
 void moveSkeleton(skeleton* enemy){
     if(enemy->isAlive == true){
-        if(enemy->x>0){
+        if(enemy->x>100){
             enemy->x -= enemy->speed;
             enemy->dir = LEFT;
             enemy->moving = true;
@@ -32,19 +32,19 @@ void moveSkeleton(skeleton* enemy){
             enemy->dir = RIGHT;
             enemy->moving = true;
         }
-        if(enemy->y > 350){
+        if(enemy->y > 250){
             enemy->y -= enemy->speed;
             enemy->moving = true;
         }
-        if(enemy->y < 350){
+        if(enemy->y < 250){
             enemy->y += enemy->speed;
             enemy->moving = true;
         }
     }
 }
 
-void skeletonCombat(skeleton* enemy, Player* player, Bullet* bullet){
-    if(bullet->x >= (enemy->x - 75) && bullet->x <= (enemy->x + 50) && bullet->y >= (enemy->y - 50)&& bullet->y <= (enemy->y + 80) && enemy->isAlive == true && bullet->isActive == true){
+void skeletonCombat(skeleton* enemy, Player* player, Bullet* bullet, Totem* totem){
+    if(bullet->x >= (enemy->x - 75) && bullet->x <= (enemy->x + 50) && bullet->y >= (enemy->y - 50)&& bullet->y <= (enemy->y + 50) && enemy->isAlive == true && bullet->isActive == true){
         bullet->isActive = false;
         enemy->health -= 50;
         if(enemy->health <= 0){
@@ -52,11 +52,38 @@ void skeletonCombat(skeleton* enemy, Player* player, Bullet* bullet){
         }
         bullet->frame = 0;
     }
-    if(player->x >= (enemy->x - 75) && player->x <= (enemy->x + 50) && player->y >= (enemy->y - 50)&& player->y <= (enemy->y + 80) && enemy->isAlive == true){
-        player->health -= 10;
-    }
     if(enemy->health <= 0){
         enemy->isAlive = false;
+    }
+    if(player->isAlive == false){
+        player->isHit == false;
+    }
+    if(player->x >= (enemy->x - 85) && player->x <= (enemy->x + 60) && player->y >= (enemy->y - 120)&& player->y <= (enemy->y + 40) && enemy->isAlive == true && player->isHit == false && player->isAlive == true){
+        if(enemy->frame = 6){
+            player->health -= 15;
+            player->isHit = true;
+            player->frame = 0;
+        }
+        if(player->health <= 0){
+            player->isAlive = false;
+            player->frame = 0;
+        }
+        enemy->isAttacking = true;
+    }
+    else if (player->x < enemy->x - 85 || player->x > enemy->x + 60 || player->y < enemy->y - 120 || player->y > enemy->y + 40 || enemy->isAlive != true || player->isAlive != true){
+        enemy->isAttacking = false;
+    }
+    if(totem->x >= (enemy->x - 85) && totem->x <= (enemy->x + 60) && totem->y >= (enemy->y - 120) && totem->y <= (enemy->y + 40) && enemy->isAlive == true && totem->isHit == false && totem->isAlive == true){
+        if(enemy->frame = 6){
+            totem->health -= 30;
+            totem->isHit = true;
+            totem->frame = 0;
+        }
+        if(totem->health <= 0){
+            totem->isAlive = false;
+            totem->frame = 0;
+        }
+        enemy->isAttacking = true;
     }
 }
 
@@ -82,7 +109,7 @@ goblin* createGoblin(int x, int y, int width, int height, int health, int speed)
 
 void moveGoblin(goblin* enemy){
     if(enemy->isAlive == true){
-        if(enemy->x>0){
+        if(enemy->x>100){
             enemy->x -= enemy->speed;
             enemy->dir = LEFT;
             enemy->moving = true;
@@ -92,18 +119,18 @@ void moveGoblin(goblin* enemy){
             enemy->dir = RIGHT;
             enemy->moving = true;
         }
-        if(enemy->y > 350){
+        if(enemy->y > 250 && enemy->y >= enemy->x){
             enemy->y -= enemy->speed;
             enemy->moving = true;
         }
-        if(enemy->y < 350){
+        if(enemy->y < 250 && enemy->y >= enemy->x){
             enemy->y += enemy->speed;
             enemy->moving = true;
         }
     }
 }
 void goblinCombat(goblin* enemy, Player* player, Bullet* bullet){
-    if(bullet->x >= (enemy->x - 75) && bullet->x <= (enemy->x + 50) && bullet->y >= (enemy->y - 20)&& bullet->y <= (enemy->y + 40) && enemy->isAlive == true && bullet->isActive == true){
+    if(bullet->x >= (enemy->x - 75) && bullet->x <= (enemy->x + 45) && bullet->y >= (enemy->y - 20)&& bullet->y <= (enemy->y + 40) && enemy->isAlive == true && bullet->isActive == true){
         bullet->isActive = false;
         enemy->health -= 50;
         if(enemy->health <= 0){
@@ -111,14 +138,26 @@ void goblinCombat(goblin* enemy, Player* player, Bullet* bullet){
         }
         bullet->frame = 0;
     }
-    if(player->x >= (enemy->x - 65) && player->x <= (enemy->x + 65) && player->y >= (enemy->y - 65)&& player->y <= (enemy->y + 55) && enemy->isAlive == true){
-        player->health -= 10;
+    else if(enemy->health <= 0){
+        enemy->isAlive = false;
+    }
+    if(player->isAlive == false){
+        player->isHit == false;
+    }
+    if(player->x >= (enemy->x - 65) && player->x <= (enemy->x + 65) && player->y >= (enemy->y - 90)&& player->y <= (enemy->y + 40) && enemy->isAlive == true && player->isHit == false && player->isAlive == true){
+        if(enemy->frame = 6){
+            player->health -= 10;
+            player->isHit = true;
+            player->frame = 0;
+        }
         if(player->health <= 0){
             player->isAlive = false;
+            player->frame = 0;
         }
+        enemy->isAttacking = true;
     }
-    if(enemy->health <= 0){
-        enemy->isAlive = false;
+    else if (player->x < enemy->x - 65 || player->x > enemy->x + 65 || player->y < enemy->y - 90 || player->y > enemy->y + 40 || enemy->isAlive != true || player->isAlive != true){
+        enemy->isAttacking = false;
     }
 }
 

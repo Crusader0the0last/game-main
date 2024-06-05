@@ -45,6 +45,7 @@ typedef struct Player{
     bool isAlive;
     bool moving;
     bool isShooting;
+    bool isHit;
     SDL_Texture *walk;
     SDL_Texture *idle;
     SDL_Texture *attack;
@@ -61,5 +62,6 @@ void updateBullet(Bullet* bullet, Player* player);
 
 void updatePlayer(Player* player);
 void destroyPlayer(Player* player);
+
 
 #endif // PLAYER_H
