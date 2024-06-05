@@ -48,7 +48,7 @@ int main(){
         bulletRect[i] = (SDL_Rect){bullets[i]->x, bullets[i]->y, bullets[i]->width, bullets[i]->height};
     }
     
-       // Create a window
+       //tvorba okna
     SDL_Window* window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Xsize, Ysize, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if (window == NULL) {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -56,7 +56,7 @@ int main(){
         return 1;
     }
 
-    // Create a renderer
+    //tvorba rendereru
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (renderer == NULL) {
         fprintf(stderr, "SDL_CreateRenderer Error: %s\n", SDL_GetError());
@@ -64,6 +64,7 @@ int main(){
         SDL_Quit();
         return 1;
     }
+    //pridelovani textur do entit a objektu
     player->walk = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Walk.png");
     player->idle = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Idle.png");
     player->attack = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Attack_1.png");
@@ -88,13 +89,15 @@ int main(){
     }
     bulletTexture = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Charge_2.png");
 
+    //doplnek k casovani frames
     Uint32 currentTime = 0;
 
+    //polovina setupu "state" pro pohyb a akce hrace
     const Uint8* state = SDL_GetKeyboardState(NULL);
 
+    //hlavni loop
     SDL_Event e;
     bool quit = false;
-
     while (!quit) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
@@ -104,16 +107,17 @@ int main(){
                 quit = true;
             }
         }
+    //pozadi na cerno
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
+
+    //druha polovina state
     state = SDL_GetKeyboardState(NULL);
 
+    //utok hrace
     static bool isFKeyPressed = false;
         if(state[SDL_SCANCODE_F] && !isFKeyPressed && player->isShooting == false && player->isHit == false){
             isFKeyPressed = true;
-            //if(bullet1active == true && bullet2active == true && bullet3active == true && bullet4active == true && bullet5active == true){
-            //sdl2_ttf::messageBox("no mana");
-            //}
             for(int i = 0; i < 5; i++){
                 if(bullets[i]->isActive == false) {
                     player->frame = 0;
@@ -126,6 +130,8 @@ int main(){
     if(state[SDL_SCANCODE_F]){
         isFKeyPressed = false;
     }
+
+    //pohyb hrace
     if(player->isShooting == false && player->isAlive == true){
         if(state[SDL_SCANCODE_W]){
             player->moving = true;
@@ -164,6 +170,7 @@ int main(){
         }
     }
 
+    //pohyb a update strel
     for(int i = 0; i < 5; i++){
         updateBullet(bullets[i], player);
         bulletRect[i].x = bullets[i]->x;
@@ -171,8 +178,8 @@ int main(){
     }
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    //player texture render
 
+    //render hrace
     SDL_Rect playerRect = {player->x, player->y, player->width, player->height};
     if(player->dir == RIGHT || player->dir == UPRIGHT || player->dir == DOWNRIGHT || player->dir == UP || player->dir == DOWN){
         if(player->moving == false && player->isShooting == false && player->isAlive == true && player->isHit == false){
@@ -215,6 +222,7 @@ int main(){
         }
     }
 
+    //casovani hodnot pro kontrolu frames
     currentTime = SDL_GetTicks();
     if(currentTime - startTime >= 150 && player->isAlive == false){
         startTime = currentTime;
@@ -256,8 +264,7 @@ int main(){
         totem->isHit = false;
     }
 
-    //bullet texture render
-
+    //render strel hrace
     for(int i = 0; i < 5; i++){
         if(bullets[i]->dir == RIGHT || bullets[i]->dir == LEFT){
             bullets[i]->angle = 0;
@@ -278,9 +285,11 @@ int main(){
             bullets[i]->frame = 0;
         }
     }
-    //load enemy textures
-    
+
+    //render nepratel (kostlivcu a goblinu zaroven)
     for(int i = 0; i < 3; i++){
+
+        //pohyb nepratel
         moveSkeleton(skeletons[i]);
         moveGoblin(goblins[i]);
 
@@ -328,7 +337,7 @@ int main(){
                 goblins[i]->frame = 0;
             }
         }
-        //skeleton texture render
+        //kostlivci
         if(skeletons[i]->isAlive == true && skeletons[i]->moving == true && skeletons[i]->isAttacking == false){
             if(skeletons[i]->dir == LEFT){
                 SDL_RenderCopyEx(renderer, (skeletons[i]->walk), &(SDL_Rect) {skeletons[i]->frame*150, 0, 150, 150}, &skeletonsRect[i], 0, NULL, 1);
@@ -371,6 +380,8 @@ int main(){
             }
         }
     }
+
+    //combat nepratel (urcovani jejich utoku a jejich umirani)
     int bc = 0;
     for(int e = 0; e < 3;){
         skeletonCombat(skeletons[e], player, bullets[bc], totem);
@@ -381,8 +392,9 @@ int main(){
             e++;
         }
     }
-    SDL_RenderCopyEx(renderer, totem->main, &(SDL_Rect) {totem->frame*200, 0, 400, 400}, &(SDL_Rect) {totem->x, totem->y, totem->width, totem->height}, 0, NULL, 0);
     
+    //render totemu(portalu)
+    SDL_RenderCopyEx(renderer, totem->main, &(SDL_Rect) {totem->frame*200, 0, 400, 400}, &(SDL_Rect) {totem->x, totem->y, totem->width, totem->height}, 0, NULL, 0);
     for(int i =0; i<3; i++){
         if(totem->isAlive == false){
             SDL_RenderCopyEx(renderer, totem->death, &(SDL_Rect) {totem->frame*51, 0, 48, 48}, &(SDL_Rect) {totem->x, totem->y, totem->width, totem->height}, 0, NULL, 0);

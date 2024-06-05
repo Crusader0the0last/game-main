@@ -3,6 +3,7 @@
 
 #include "player.h"
 
+//struktura totemu
 typedef struct Totem{
     int health;
     int x;

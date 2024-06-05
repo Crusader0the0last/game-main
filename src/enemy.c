@@ -1,5 +1,6 @@
 #include "enemy.h"
 
+//vytvareni jednotlivich kostlivcu
 skeleton* createSkeleton(int x, int y, int width, int height, int health, int speed){
     skeleton* enemy = (skeleton*)malloc(sizeof(skeleton));
     enemy->x = x;
@@ -20,6 +21,7 @@ skeleton* createSkeleton(int x, int y, int width, int height, int health, int sp
     return enemy;
 }
 
+//pohyb kostlivce
 void moveSkeleton(skeleton* enemy){
     if(enemy->isAlive == true){
         if(enemy->x>100){
@@ -43,6 +45,7 @@ void moveSkeleton(skeleton* enemy){
     }
 }
 
+//combat kostlivce
 void skeletonCombat(skeleton* enemy, Player* player, Bullet* bullet, Totem* totem){
     if(bullet->x >= (enemy->x - 75) && bullet->x <= (enemy->x + 50) && bullet->y >= (enemy->y - 50)&& bullet->y <= (enemy->y + 50) && enemy->isAlive == true && bullet->isActive == true){
         bullet->isActive = false;
@@ -58,6 +61,7 @@ void skeletonCombat(skeleton* enemy, Player* player, Bullet* bullet, Totem* tote
     if(player->isAlive == false){
         player->isHit == false;
     }
+    //utok na hrace
     if(player->x >= (enemy->x - 85) && player->x <= (enemy->x + 60) && player->y >= (enemy->y - 120)&& player->y <= (enemy->y + 40) && enemy->isAlive == true && player->isHit == false && player->isAlive == true){
         if(enemy->frame = 6){
             player->health -= 15;
@@ -73,6 +77,7 @@ void skeletonCombat(skeleton* enemy, Player* player, Bullet* bullet, Totem* tote
     else if (player->x < enemy->x - 85 || player->x > enemy->x + 60 || player->y < enemy->y - 120 || player->y > enemy->y + 40 || enemy->isAlive != true || player->isAlive != true){
         enemy->isAttacking = false;
     }
+    //utok na totem
     if(totem->x >= (enemy->x - 85) && totem->x <= (enemy->x + 60) && totem->y >= (enemy->y - 120) && totem->y <= (enemy->y + 40) && enemy->isAlive == true && totem->isHit == false && totem->isAlive == true){
         if(enemy->frame = 6){
             totem->health -= 30;
@@ -87,6 +92,7 @@ void skeletonCombat(skeleton* enemy, Player* player, Bullet* bullet, Totem* tote
     }
 }
 
+//vytvareni jednotlivich goblinu
 goblin* createGoblin(int x, int y, int width, int height, int health, int speed){
     goblin* enemy = (goblin*)malloc(sizeof(goblin));
     enemy->x = x;
@@ -107,6 +113,7 @@ goblin* createGoblin(int x, int y, int width, int height, int health, int speed)
     return enemy;
 }
 
+//pohyb goblina
 void moveGoblin(goblin* enemy){
     if(enemy->isAlive == true){
         if(enemy->x>100){
@@ -129,6 +136,8 @@ void moveGoblin(goblin* enemy){
         }
     }
 }
+
+//combat goblina
 void goblinCombat(goblin* enemy, Player* player, Bullet* bullet){
     if(bullet->x >= (enemy->x - 75) && bullet->x <= (enemy->x + 45) && bullet->y >= (enemy->y - 20)&& bullet->y <= (enemy->y + 40) && enemy->isAlive == true && bullet->isActive == true){
         bullet->isActive = false;

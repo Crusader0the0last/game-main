@@ -3,6 +3,7 @@
 
 #include "sacred.h"
 
+//struktura goblinu
 typedef struct Goblin{
     int health;
     int speed;
@@ -22,6 +23,7 @@ typedef struct Goblin{
     SDL_Texture *dead;
 }goblin;
 
+//struktura skeletonu
 typedef struct Skeleton{
     int health;
     int speed;
@@ -41,6 +43,20 @@ typedef struct Skeleton{
     SDL_Texture *dead;
 }skeleton;
 
+//struktura bosse (bude pridan v pozdejsi verzi)
+typedef struct enemyBullet{
+    int x;
+    int y;
+    int width;
+    int height;
+    int speed;
+    direction dir;
+    bool isActive;
+    bool hit;
+    int frame;
+}enemyBullet;
+
+//struktura strel bosse
 typedef struct Boss{
     int x;
     int y;
@@ -53,18 +69,6 @@ typedef struct Boss{
     int bossPhase;
     int frame;
 }Boss;
-
-typedef struct enemyBullet{
-    int x;
-    int y;
-    int width;
-    int height;
-    int speed;
-    direction dir;
-    bool isActive;
-    bool hit;
-    int frame;
-}enemyBullet;
 
 skeleton* createSkeleton(int x, int y, int width, int height, int health, int speed);
 Boss* createBoss(int x, int y, int width, int height, int speed);

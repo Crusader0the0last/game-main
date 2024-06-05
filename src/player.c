@@ -1,5 +1,6 @@
 #include "player.h"
 
+//tvorba hrace
 Player* createPlayer(int x, int y, int width, int height, int health, int speed, int score){
     Player* player = (Player*)malloc(sizeof(Player));
     player->x = x;
@@ -18,6 +19,7 @@ Player* createPlayer(int x, int y, int width, int height, int health, int speed,
     return player;
 }
 
+//tvorba strely hrace
 Bullet* createBullet(int x, int y, int width, int height, int speed, direction dir){
     Bullet* bullet = (Bullet*)malloc(sizeof(Bullet));
     bullet->x = x;
@@ -34,6 +36,7 @@ Bullet* createBullet(int x, int y, int width, int height, int speed, direction d
     return bullet;
 }
 
+//pohyb hrace
 void movePlayer(Player* player, direction dir){
     if(dir == UP){
         player->y -= player->speed;
@@ -49,12 +52,15 @@ void movePlayer(Player* player, direction dir){
     }
 }
 
+//strileni hrace
 void combatPlayer(Player* player, Bullet* bullet){
     bullet->isActive = true;
     bullet->dir = player->dir;
 }
 
+//aktualizace strely
 void updateBullet(Bullet* bullet, Player* player){
+    //pohyb strely
     if(bullet->isActive == true){
         if(bullet->dir == UP){
             bullet->y -= bullet->speed;
@@ -85,6 +91,7 @@ void updateBullet(Bullet* bullet, Player* player){
             bullet->y += bullet->speed - (bullet->speed/2);
         }
     }
+    //reset pozice na hrace
     else if(bullet->isActive == false){
         bullet->x = player->x;
         bullet->y = (player->y+10);
@@ -96,6 +103,7 @@ void updateBullet(Bullet* bullet, Player* player){
     }
 }
 
+//aktualizace hrace
 void updatePlayer(Player* player){
     if(player->health <= 0){
         player->isAlive = false;
@@ -103,6 +111,7 @@ void updatePlayer(Player* player){
     
 }
 
+//zniceni hrace
 void destroyPlayer(Player* player){
     free(player);
 }

@@ -1,5 +1,6 @@
 #include "sacred.h"
 
+//tvorba totemu
 Totem* createtotem(int x, int y, int width, int height, int health){
     Totem* totem = (Totem*)malloc(sizeof(Totem));
     totem->x = x;

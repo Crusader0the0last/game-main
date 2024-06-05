@@ -7,6 +7,7 @@
 #include <time.h>
 #include <SDL.h>
 
+//struktura smeru (bude urcovat smer textur a pohybu strel)
 typedef enum direction{
     UP,
     DOWN,
@@ -18,6 +19,7 @@ typedef enum direction{
     DOWNLEFT
 }direction;
 
+//struktura strel hrace
 typedef struct Bullet{
     int x;
     int y;
@@ -32,6 +34,7 @@ typedef struct Bullet{
     int angle;
 }Bullet;
 
+//struktura hrace
 typedef struct Player{
     int health;
     int speed;
