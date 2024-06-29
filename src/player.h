@@ -47,6 +47,7 @@ typedef struct Player{
     direction dir;
     bool isAlive;
     bool moving;
+    int jumpSpeed;
     bool isShooting;
     bool isHit;
     SDL_Texture *walk;
@@ -54,12 +55,15 @@ typedef struct Player{
     SDL_Texture *attack;
     SDL_Texture *hit;
     SDL_Texture *dead;
+    SDL_Texture *jump;
 }Player;
 
 Player* createPlayer(int x, int y, int width, int height, int health, int speed, int score);
 Bullet* createBullet(int x, int y, int width, int height, int speed, direction dir);
 
 void movePlayer(Player* player, direction dir);
+void playerJump(Player* player);
+
 void combatPlayer(Player* player, Bullet* bullet);
 void updateBullet(Bullet* bullet, Player* player);
 

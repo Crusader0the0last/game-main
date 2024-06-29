@@ -70,6 +70,7 @@ int main(){
     player->attack = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Attack_1.png");
     player->dead = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Dead.png");
     player->hit = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Hurt.png");
+    player->jump = IMG_LoadTexture(renderer, "pictures/Wanderer Magican/Jump.png");
 
     totem->main = IMG_LoadTexture(renderer, "pictures/FlyingObelisk_no_lightnings_no_letter.png");
     totem->death = IMG_LoadTexture(renderer, "pictures/Holy VFX 02/Holy VFX 02.png");
@@ -135,12 +136,12 @@ int main(){
     if(player->isShooting == false && player->isAlive == true){
         if(state[SDL_SCANCODE_W]){
             player->moving = true;
-            movePlayer(player, UP);
+            playerJump(player);
             player->dir = UP;
         }
         if(state[SDL_SCANCODE_S]){
-            player->moving = true;
-            movePlayer(player, DOWN);
+            // player->moving = true;
+            // movePlayer(player, DOWN);
             player->dir = DOWN;
         }
         if(state[SDL_SCANCODE_A]){
@@ -303,7 +304,7 @@ int main(){
             else if(goblins[i]->dir == RIGHT){
                 SDL_RenderCopyEx(renderer, (goblins[i]->walk), &(SDL_Rect) {goblins[i]->frame*150, 0, 150, 150}, &goblinsRect[i], 0, NULL, 0);
             }
-            if(goblins[i]->frame>7){
+            if(goblins[i]->frame>6){
                 goblins[i]->frame = 0;
             }
         }
@@ -392,7 +393,7 @@ int main(){
             e++;
         }
     }
-    
+
     //render totemu(portalu)
     SDL_RenderCopyEx(renderer, totem->main, &(SDL_Rect) {totem->frame*200, 0, 400, 400}, &(SDL_Rect) {totem->x, totem->y, totem->width, totem->height}, 0, NULL, 0);
     for(int i =0; i<3; i++){

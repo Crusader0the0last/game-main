@@ -16,6 +16,7 @@ Player* createPlayer(int x, int y, int width, int height, int health, int speed,
     player->isShooting = false;
     player->hit = false;
     player->frame = 0;
+    player->jumpSpeed = 20;
     return player;
 }
 
@@ -38,17 +39,19 @@ Bullet* createBullet(int x, int y, int width, int height, int speed, direction d
 
 //pohyb hrace
 void movePlayer(Player* player, direction dir){
-    if(dir == UP){
-        player->y -= player->speed;
-    }
-    if(dir == DOWN){
-        player->y += player->speed;
-    }
     if(dir == LEFT){
         player->x -= player->speed;
     }
     if(dir == RIGHT){
         player->x += player->speed;
+    }
+}
+
+void playerJump(Player* player){
+    player->y -= player->jumpSpeed;
+    player->jumpSpeed -= 1;
+    if(player->jumpSpeed == 0){
+        player->jumpSpeed = 20;
     }
 }
 
